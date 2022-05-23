@@ -233,6 +233,36 @@ export default (testContext: {
       expect(webIdentifier2.keys.length).toEqual(2)
     })
 
+    
+    it('should fail to add bad key to identifier', async () => {
+      const webIdentifier = await agent.didManagerGetOrCreate({
+        alias: 'footbarl.com',
+        provider: 'did:web',
+      })
+
+      expect(webIdentifier.keys.length).toEqual(1)
+
+      const result = await agent.didManagerAddKey({
+        did: webIdentifier.did,
+        key: {
+          kid: "foo",
+          // @ts-ignore
+          type: "bar",
+          kms: "asdf",
+          publicKeyHex: "a"
+        },
+      })
+
+      expect(result).toEqual({ success: false })
+
+      const webIdentifier2 = await agent.didManagerGetOrCreate({
+        alias: 'footbarl.com',
+        provider: 'did:web',
+      })
+
+      expect(webIdentifier2.keys.length).toEqual(1)
+    })
+
     it('should remove key from identifier', async () => {
       const webIdentifier = await agent.didManagerGet({
         did: 'did:web:foobar.com',

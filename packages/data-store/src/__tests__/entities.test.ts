@@ -5,6 +5,7 @@ import { Identifier, Message, Claim } from '../index'
 import { Entities } from '../index'
 import { blake2bHex } from 'blakejs'
 import * as fs from 'fs'
+import { Key } from '../entities/key'
 
 describe('DB entities test', () => {
   let connection: Connection
@@ -36,6 +37,18 @@ describe('DB entities test', () => {
 
     const fromDb = await Identifier.findOne(identifier.did)
     expect(fromDb?.did).toEqual(identifier.did)
+  })
+
+  it('Saves key to DB', async () => {
+    const key = new Key()
+    key.kid = '123'
+    key.type = 'Ed25519'
+    key.kms = 'fake'
+    key.publicKeyHex = 'ok'
+    await key.save()
+
+    const fromDb = await Key.findOne(key.kid)
+    expect(fromDb?.kid).toEqual('123')
   })
 
   it('Saves credential with claims', async () => {
